@@ -1,4 +1,4 @@
-# $Id: 70_PhilipsTV.pm 164124 2024-10-03 00:00:00Z RalfP $
+# $Id: 70_PhilipsTV.pm 164659 2025-01-22 00:00:00Z RalfP $
 ###############################################################################
 #
 #     70_PhilipsTV.pm 
@@ -73,7 +73,7 @@ use UPnP::ControlPoint;
 
 # Modul Constanten #############################################################
 
-use constant VERSION 			   	=> "v1.0.0";
+use constant VERSION 			   	=> "v1.0.2";
 
 use constant TERMINAL_VENDOR	   	=> "Fhem";
 use constant USER_AGENT 		   	=> "Fhem";
@@ -108,7 +108,11 @@ my %upnpState = (
 my $client = LWP::UserAgent->new();
 my $request = HTTP::Request->new(); 
 
-$client->ssl_opts(SSL_fingerprint => 'sha1$96A52B034901D9580C9ECFD4B6C9442EC483C3EB'); #aus restfultv_tpvision_com.crt
+#$client->ssl_opts(SSL_fingerprint => 'sha1$96A52B034901D9580C9ECFD4B6C9442EC483C3EB'); #aus restfultv_tpvision_com.crt - Verbindung zu einem 65OLED805
+#$client->ssl_opts(SSL_fingerprint => 'sha1$064186DEC3A145D2DA0D45174168E8BF836C0EC1'); #aus SSL Zertifikat - Verbindung zu einem 77OLED809
+
+$client->ssl_opts(verify_hostname => 0,SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE,); # ohne Prüfung
+
 $client->agent(USER_AGENT);
 
 
@@ -1418,6 +1422,8 @@ sub PhilipsTV_Notify {
 sub PhilipsTV_GetStatus {
     my ( $hash ) = @_;
     my $name = $hash->{NAME};
+    
+    my $dataLoaded = 0;
 
     Log3 $name, 5, $name.": <GetStatus> called";
     
@@ -1446,7 +1452,7 @@ sub PhilipsTV_GetStatus {
 		
 		#nur wenn Pairing OK
 		if(PhilipsTV_isPairingNecessary($hash) == PAIR_OK){
-			my $dataLoaded = 1;
+			$dataLoaded = 1;
 			# PowerRequest
 			unless($hash->{helper}{powerstate}{notifychangeState}){
 		    	unless(PhilipsTV_PowerRequest($hash)){ 
@@ -1496,7 +1502,11 @@ sub PhilipsTV_GetStatus {
     if(($hash->{helper}{upnp}{STATE} == FOUND) || ($hash->{helper}{upnp}{STATE} == FIRSTFOUND)){
   	
 	  	#Polling
-	  	if(AttrVal($name,"pollingInterval",30) > 0){
+	  	if($dataLoaded == 0){
+	  		Log3 $name, 3, $name.": <GetStatus> data not loaded - repeate" ; #if($hash->{helper}{upnp}{STATE} == FIRSTFOUND);
+	  		InternalTimer(gettimeofday() + 10 , "PhilipsTV_GetStatus", $hash);
+		}
+	  	elsif(AttrVal($name,"pollingInterval",30) > 0){
 	  		Log3 $name, 4, $name.": <GetStatus> succesfull setup of polling - interval" if($hash->{helper}{upnp}{STATE} == FIRSTFOUND);
 	  		InternalTimer(gettimeofday() + 10 + int(rand(AttrVal($name,"pollingInterval",30))), "PhilipsTV_GetStatus", $hash);
 		}
