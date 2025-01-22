@@ -3,7 +3,7 @@
 
 PhilipsTV findet automatisch Philips TV's, kann diese steuern und zeigt weitere Informationen an.
 
-Getestet mit 65OLED805/12
+Getestet mit 65OLED805/12; 77OLED809/12
 
 ### update
 
