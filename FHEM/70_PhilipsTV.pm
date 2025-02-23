@@ -1,4 +1,4 @@
-# $Id: 70_PhilipsTV.pm 164659 2025-01-22 00:00:00Z RalfP $
+# $Id$
 ###############################################################################
 #
 #     70_PhilipsTV.pm 
@@ -73,7 +73,7 @@ use UPnP::ControlPoint;
 
 # Modul Constanten #############################################################
 
-use constant VERSION 			   	=> "v1.0.2";
+use constant VERSION 			   	=> "v1.0.3";
 
 use constant TERMINAL_VENDOR	   	=> "Fhem";
 use constant USER_AGENT 		   	=> "Fhem";
@@ -1506,7 +1506,7 @@ sub PhilipsTV_GetStatus {
 	  		Log3 $name, 3, $name.": <GetStatus> data not loaded - repeate" ; #if($hash->{helper}{upnp}{STATE} == FIRSTFOUND);
 	  		InternalTimer(gettimeofday() + 10 , "PhilipsTV_GetStatus", $hash);
 		}
-	  	elsif(AttrVal($name,"pollingInterval",30) > 0){
+	  	elsif(AttrVal($name,"pollingInterval",0) > 0){
 	  		Log3 $name, 4, $name.": <GetStatus> succesfull setup of polling - interval" if($hash->{helper}{upnp}{STATE} == FIRSTFOUND);
 	  		InternalTimer(gettimeofday() + 10 + int(rand(AttrVal($name,"pollingInterval",30))), "PhilipsTV_GetStatus", $hash);
 		}
