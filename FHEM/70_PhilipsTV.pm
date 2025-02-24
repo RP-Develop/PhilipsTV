@@ -1508,7 +1508,7 @@ sub PhilipsTV_GetStatus {
 		}
 	  	elsif(AttrVal($name,"pollingInterval",0) > 0){
 	  		Log3 $name, 4, $name.": <GetStatus> succesfull setup of polling - interval" if($hash->{helper}{upnp}{STATE} == FIRSTFOUND);
-	  		InternalTimer(gettimeofday() + 10 + int(rand(AttrVal($name,"pollingInterval",30))), "PhilipsTV_GetStatus", $hash);
+	  		InternalTimer(gettimeofday() + AttrVal($name,"pollingInterval",30), "PhilipsTV_GetStatus", $hash);
 		}
 	  	else{
 	  		Log3 $name, 4, $name.": <GetStatus> succesfull setup of polling - off";
