@@ -73,7 +73,7 @@ use UPnP::ControlPoint;
 
 # Modul Constanten #############################################################
 
-use constant VERSION 			   	=> "v1.0.3";
+use constant VERSION 			   	=> "v1.0.4";
 
 use constant TERMINAL_VENDOR	   	=> "Fhem";
 use constant USER_AGENT 		   	=> "Fhem";
